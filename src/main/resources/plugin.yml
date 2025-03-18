@@ -1,0 +1,11 @@
+name: SkyPVPTools
+version: '0'
+main: cn.irina.main.SkyPVPTools
+description: Create for SkyPVP
+depend:
+  - XConomy
+
+commands:
+  irina:
+    description: 主指令 Irina
+    usage: /irina <子指令>

@@ -1,0 +1,9 @@
+#注: 此插件经济前置为 "XConomy"
+
+#单个装备修复所需金额
+AmountRequiredForRepair: 1500
+
+#完全支持PlaceholderAPI
+Message:
+  Join: "&8[&a+&8] &7%player_name%"
+  Quit: "&8[&c-&8] &7%player_name%"
