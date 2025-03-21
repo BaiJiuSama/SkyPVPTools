@@ -19,7 +19,7 @@ class PlayerListener : Listener {
         val player = event.player
 
         event.joinMessage = null
-        Bukkit.broadcastMessage(Chat.normalTranslate(PApi.parsePlaceholders(player, plugin.config.getString("Message.Join"))))
+        Bukkit.broadcastMessage(Chat.normalTranslate(PApi.parsePlaceholders(player, plugin.config.getString("OtherMessage.Join"))))
     }
 
     @EventHandler (priority = EventPriority.MONITOR)
@@ -27,6 +27,6 @@ class PlayerListener : Listener {
         val player = event.player
 
         event.quitMessage = null
-        Bukkit.broadcastMessage(Chat.normalTranslate(PApi.parsePlaceholders(player, plugin.config.getString("Message.Quit"))))
+        Bukkit.broadcastMessage(Chat.normalTranslate(PApi.parsePlaceholders(player, plugin.config.getString("OtherMessage.Quit"))))
     }
 }

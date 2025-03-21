@@ -1,11 +1,14 @@
 package cn.irina.main
 
-import cn.irina.main.command.MainCommand
+import cn.irina.main.command.CommandManager
+import cn.irina.main.command.impl.Sell
 import org.bukkit.plugin.java.JavaPlugin
 import cn.irina.main.util.Chat
 import cn.irina.main.util.ClassUtil
+import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
+import org.bukkit.plugin.RegisteredServiceProvider
 import java.lang.reflect.InvocationTargetException
 
 class SkyPVPTools : JavaPlugin() {
@@ -20,6 +23,15 @@ class SkyPVPTools : JavaPlugin() {
     init {
         plugin = this
         instance = this
+    }
+
+    var economy: Economy? = null
+
+    fun setupEconomy() {
+        Bukkit.getServer().pluginManager.getPlugin("Vault") ?: return
+        val rsp: RegisteredServiceProvider<Economy> = Bukkit.getServer().servicesManager.getRegistration(Economy::class.java)
+            ?: return
+        economy = rsp.provider
     }
 
     override fun onEnable() {
@@ -43,8 +55,9 @@ class SkyPVPTools : JavaPlugin() {
                 return@runTaskLaterAsynchronously
             }
 
+            setupEconomy()
             loadListener()
-            registerCommand()
+            CommandManager.registerCommand()
 
             Chat.log("&aSkyPVPTools 已启动")
         }, 21L)
@@ -54,10 +67,6 @@ class SkyPVPTools : JavaPlugin() {
         Chat.log("&cSkyPVPTools 已关闭")
     }
 
-    fun registerCommand() {
-        getCommand("irina").apply { executor = MainCommand() }
-    }
-
     @Throws(
         InstantiationException::class,
         IllegalAccessException::class,
@@ -65,7 +74,7 @@ class SkyPVPTools : JavaPlugin() {
         InvocationTargetException::class
     )
     fun loadListener() {
-        val classes = ClassUtil.getClassesInPackage(this, "cn.irina")
+        val classes = ClassUtil.getClassesInPackage(this, "cn.irina.main")
 
         if (classes == null) return
 

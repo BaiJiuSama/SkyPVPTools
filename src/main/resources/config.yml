@@ -4,6 +4,28 @@
 AmountRequiredForRepair: 1500
 
 #完全支持PlaceholderAPI
-Message:
+OtherMessage:
   Join: "&8[&a+&8] &7%player_name%"
   Quit: "&8[&c-&8] &7%player_name%"
+
+#出售界面的标题
+SellGUIName: '&e出售系统'
+#出售界面的格数(不可以低于18，必须为9的倍数, 最高为54)
+SellGUISlot: 54
+#如果以Lore判断回收价格，那么下面就是判断的Lore
+SellLore: '回收价格'
+#是否以Lore判断回收价格(false则只判断原版ID)
+LoreDetermine: false
+#语言
+Message:
+  SaleSuccess: '&f[&e出售&f] 你出售物品获得了 &e%price% &f金币!'
+  NotforSale: '&f[&e出售&f] 你放入的物品不可以 &e出售 &f哦!'
+  Noitems: '&f[&e出售&f] 请放入你需要 &e出售 &f的物品!'
+  NoHandItems: '&f[&e出售&f] 请手持你需要添加的物品!'
+  ErrorSellPrice: '&f[&e出售&f] 请填写正确的出售价格!'
+  AddSellItem: '&f[&e出售&f] 已将物品 &e%ItemType% &f添加到出售列表中, 售价为 &e%price% &f金币'
+  NoPermission: '&f[&e出售&f] 你没有使用当前指令的权限!'
+#以下为创建收购物品的地方，格式为(物品ID: 价格)
+#物品ID可手持物品输入指令 /Sell id 查询
+SellItem:
+  DIAMOND: 50

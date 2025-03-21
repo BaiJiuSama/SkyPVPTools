@@ -1,11 +1,19 @@
 name: SkyPVPTools
-version: '0'
+version: '02'
 main: cn.irina.main.SkyPVPTools
 description: Create for SkyPVP
 depend:
   - XConomy
+  - PlaceholderAPI
+  - Vault
 
 commands:
   irina:
     description: 主指令 Irina
     usage: /irina <子指令>
+  gm:
+    description: 快速指令 gm
+    usage: /gm <GameMode>
+  sell:
+    description: 缝合指令 sell
+    usage: /sell

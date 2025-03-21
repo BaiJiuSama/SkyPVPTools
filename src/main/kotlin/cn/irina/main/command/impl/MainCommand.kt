@@ -1,4 +1,4 @@
-package cn.irina.main.command
+package cn.irina.main.command.impl
 
 import cn.irina.main.SkyPVPTools
 import cn.irina.main.util.Chat
@@ -76,8 +76,9 @@ class MainCommand : CommandExecutor {
             "&b&l| &f&lSkyPVPTools &7&l- &f&lBy &b&lI&f&lRINA",
             "&b&l| &f/irina",
             "&b&l| &f- fix <修复你的装备>",
-            "&b&l| &f- bind <绑定你的大神装备使其不会掉落>",
-            "&b&l| &f- unbind <对没错这是解绑你的大神装备的>",
+            "&b&l| ",
+            "&b&l| &cADMIN",
+            "&b&l| &f/gm < 0 / 1 / 2 / 3 >",
             "&b&l| "
         ))
 

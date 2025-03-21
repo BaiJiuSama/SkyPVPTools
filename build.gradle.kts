@@ -21,6 +21,7 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.32")
     compileOnly(fileTree(baseDir = "lib"))
     implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("reflect"))
 }
 
 group = "cn.irina"
@@ -38,7 +39,7 @@ kotlin {
     jvmToolchain(17)
 }
 
-tasks{
+tasks {
     withType<JavaCompile>() {
         options.encoding = "UTF-8"
         options.compilerArgs.add("-nowarn")
@@ -52,6 +53,9 @@ tasks{
         exclude("io/netty/**")
 
         minimize()
+        minimize {
+            exclude(dependency("org.jetbrains.kotlin:kotlin-reflect:.*"))
+        }
 
         relocate("kotlin", "cn.irina.thirdparty.kotlin")
 
