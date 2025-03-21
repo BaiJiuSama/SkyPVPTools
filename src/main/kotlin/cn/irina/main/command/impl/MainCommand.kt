@@ -77,6 +77,8 @@ class MainCommand : CommandExecutor {
             "&b&l| &f/irina",
             "&b&l| &f- fix <修复你的装备>",
             "&b&l| ",
+            "&b&l| &f/sell <对没错这是给你卖东西的>",
+            "&b&l| ",
             "&b&l| &cADMIN",
             "&b&l| &f/gm < 0 / 1 / 2 / 3 >",
             "&b&l| "
