@@ -16,7 +16,7 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 
-class Sell : Listener , CommandExecutor {
+class Sell : Listener, CommandExecutor {
     private val plugin: JavaPlugin = SkyPVPTools.plugin!!
     private val config = plugin.config
 

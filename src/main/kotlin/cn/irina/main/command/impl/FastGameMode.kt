@@ -9,13 +9,13 @@ import org.bukkit.entity.Player
 
 class FastGameMode: CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command?, label: String?, args: Array<out String>): Boolean {
-        (sender !is Player).apply {
+        if (sender !is Player) {
             sender.sendMessage(Chat.translate("&c非玩家不可执行此指令!"))
             return true
         }
 
-        val player = sender as Player
-        (player.hasPermission("irina.admin")).apply {
+        val player = sender
+        if (!player.hasPermission("irina.admin")) {
             player.sendMessage(Chat.translate("&c你没有权限!"))
             return true
         }
