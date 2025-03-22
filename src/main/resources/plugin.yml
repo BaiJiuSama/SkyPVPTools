@@ -14,6 +14,9 @@ commands:
   gm:
     description: 快速指令 gm
     usage: /gm <GameMode>
+  lore:
+    description: Lore控制 lore
+    usage: /lore
   sell:
     description: 缝合指令 sell
     usage: /sell
