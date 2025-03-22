@@ -94,11 +94,10 @@ class MainCommand : CommandExecutor {
             "&b&l| ",
             "&b&l| &cADMIN",
             "&b&l| &f/gm < 0 / 1 / 2 / 3 >",
+            "&b&l| &f/lore <Meta控制系统。>",
             "&b&l| "
         ))
 
-        for (string in list) {
-            sender.sendMessage(string)
-        }
+        list.forEach { sender.sendMessage(Chat.normalTranslate(it)) }
     }
 }
