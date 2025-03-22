@@ -1,7 +1,6 @@
 package cn.irina.main
 
 import cn.irina.main.command.CommandManager
-import cn.irina.main.command.impl.Sell
 import org.bukkit.plugin.java.JavaPlugin
 import cn.irina.main.util.Chat
 import cn.irina.main.util.ClassUtil

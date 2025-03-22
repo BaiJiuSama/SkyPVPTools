@@ -3,6 +3,9 @@
 #单个装备修复所需金额
 AmountRequiredForRepair: 1500
 
+#是否禁用天气变化
+DenyWeatherChange: true
+
 #完全支持PlaceholderAPI
 OtherMessage:
   Join: "&8[&a+&8] &7%player_name%"
