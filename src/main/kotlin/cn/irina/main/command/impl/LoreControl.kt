@@ -60,7 +60,7 @@ class LoreControl: CommandExecutor {
                 }
 
                 val line: Int = args[1].toInt()
-                if (line < 0) {
+                if (line - 1 < 0) {
                     player.sendMessage(Chat.translate("&c拜托...参数 <line> 最低只能为 1 诶"))
                     return true
                 }
@@ -98,7 +98,7 @@ class LoreControl: CommandExecutor {
                 }
 
                 val line = args[1].toInt()
-                if (line < 0) {
+                if (line - 1 < 0) {
                     player.sendMessage(Chat.translate("&c拜托...参数 <line> 最低只能为 1 诶"))
                     return true
                 }
