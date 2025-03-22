@@ -4,11 +4,13 @@ import cn.irina.main.SkyPVPTools
 import cn.irina.main.util.Chat
 import me.yic.xconomy.api.XConomyAPI
 import me.yic.xconomy.data.syncdata.PlayerData
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.ItemStack
 import java.math.BigDecimal
 
@@ -38,6 +40,16 @@ class MainCommand : CommandExecutor {
                 }
 
                 repair(player, item)
+            }
+
+            "bin" -> {
+                if (notPlayer(sender)) {
+                    sender.sendMessage(Chat.translate("&c非玩家不可执行此指令!"))
+                    return true
+                }
+                val player: Player = sender as Player
+                val inventory = Bukkit.createInventory(player, 54, Chat.normalTranslate("&8>>> &b垃圾桶 &8<<<"))
+                player.openInventory(inventory)
             }
 
             "help" -> showHelp(sender)
@@ -76,6 +88,7 @@ class MainCommand : CommandExecutor {
             "&b&l| &f&lSkyPVPTools &7&l- &f&lBy &b&lI&f&lRINA",
             "&b&l| &f/irina",
             "&b&l| &f- fix <修复你的装备>",
+            "&b&l| &f- bin <垃圾桶>",
             "&b&l| ",
             "&b&l| &f/sell <对没错这是给你卖东西的>",
             "&b&l| ",
