@@ -8,6 +8,7 @@ DenyWeatherChange: true
 
 #完全支持PlaceholderAPI
 OtherMessage:
+  Chat: "%luckperms_prefix% %player_name% %luckperms_suffix%&f: !msg"
   Join: "&8[&a+&8] &7%player_name%"
   Quit: "&8[&c-&8] &7%player_name%"
 

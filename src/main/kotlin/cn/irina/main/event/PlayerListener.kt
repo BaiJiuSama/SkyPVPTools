@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.Plugin
@@ -47,5 +48,12 @@ class PlayerListener : Listener {
 
             ActionBar.sendBar(attacker, Chat.normalTranslate("&e目标 &f${victim.displayName} &e剩余血量: &c$formattedHealth❤"))
         })
+    }
+
+    @EventHandler (priority = EventPriority.MONITOR)
+    fun onChat(event: AsyncPlayerChatEvent) {
+        val player = event.player
+
+        event.format = Chat.normalTranslate(PApi.parsePlaceholders(player, plugin.config.getString("OtherMessage.Chat").replace("!msg", event.message)))
     }
 }
