@@ -20,11 +20,11 @@ class FastGameMode: CommandExecutor {
             return true
         }
 
-        when (args[0].toInt()) {
-            0 -> player.gameMode = GameMode.SURVIVAL
-            1 -> player.gameMode = GameMode.CREATIVE
-            2 -> player.gameMode = GameMode.ADVENTURE
-            3 -> player.gameMode = GameMode.SPECTATOR
+        when (args[0].toString()) {
+            "0" -> player.gameMode = GameMode.SURVIVAL
+            "1" -> player.gameMode = GameMode.CREATIVE
+            "2" -> player.gameMode = GameMode.ADVENTURE
+            "3" -> player.gameMode = GameMode.SPECTATOR
             else -> {
                 player.sendMessage(Chat.translate("&c/gm < 0 / 1 / 2 / 3 >"))
                 return true

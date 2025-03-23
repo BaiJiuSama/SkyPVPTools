@@ -50,10 +50,13 @@ class PlayerListener : Listener {
         })
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
+    @EventHandler
     fun onChat(event: AsyncPlayerChatEvent) {
         val player = event.player
+        val rawMessage = plugin.config.getString("OtherMessage.Chat") ?: "%s: %s"
 
-        event.format = Chat.normalTranslate(PApi.parsePlaceholders(player, plugin.config.getString("OtherMessage.Chat").replace("!msg", event.message)))
+        val parsedMessage = PApi.parsePlaceholders(player, rawMessage.replace("!msg", event.message))
+
+        event.format = Chat.normalTranslate(String.format("%s", parsedMessage.replace("%", "%%")))
     }
 }
