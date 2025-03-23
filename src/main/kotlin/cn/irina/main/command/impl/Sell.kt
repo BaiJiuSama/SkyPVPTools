@@ -3,6 +3,7 @@ package cn.irina.main.command.impl
 import cn.irina.main.SkyPVPTools
 import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -99,7 +100,9 @@ class Sell : Listener, CommandExecutor {
     private fun getPriceFromLore(item: ItemStack): Double {
         return item.itemMeta?.lore?.filter { it.contains(sellLore) }
             ?.sumOf { lore ->
-                lore.replace(Regex("[^\\d.]"), "").toDoubleOrNull() ?: 0.0
+                val lore2 = ChatColor.stripColor(lore)
+                lore2.replace(Regex("[^\\d.]"), "")
+                    .toDoubleOrNull() ?: 0.0
             } ?: 0.0
     }
 

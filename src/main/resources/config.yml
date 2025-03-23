@@ -17,9 +17,9 @@ SellGUIName: '&e出售系统'
 #出售界面的格数(不可以低于18，必须为9的倍数, 最高为54)
 SellGUISlot: 54
 #如果以Lore判断回收价格，那么下面就是判断的Lore
-SellLore: '回收价格'
+SellLore: '回收价'
 #是否以Lore判断回收价格(false则只判断原版ID)
-LoreDetermine: false
+LoreDetermine: true
 #语言
 Message:
   SaleSuccess: '&f[&e出售&f] 你出售物品获得了 &e%price% &f金币!'
@@ -31,7 +31,4 @@ Message:
   NoPermission: '&f[&e出售&f] 你没有使用当前指令的权限!'
 #以下为创建收购物品的地方，格式为(物品ID: 价格)
 #物品ID可手持物品输入指令 /Sell id 查询
-SellItem:
-  STAINED_GLASS: 10
-  NETHER_STAR: 1000
-  OBSIDIAN: 500
+SellItem: []

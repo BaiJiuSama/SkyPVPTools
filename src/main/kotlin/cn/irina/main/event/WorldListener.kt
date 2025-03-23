@@ -4,10 +4,13 @@ import cn.irina.main.SkyPVPTools.Companion.plugin
 import cn.irina.main.util.Chat.Companion.normalTranslate
 import cn.irina.main.util.Chat.Companion.translate
 import cn.irina.main.util.RandomUtil
+import org.bukkit.Bukkit
 import org.bukkit.DyeColor
 import org.bukkit.DyeColor.*
 import org.bukkit.Material
 import org.bukkit.Sound
+import org.bukkit.block.Block
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -15,11 +18,23 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.weather.WeatherChangeEvent
 import org.bukkit.inventory.ItemStack
+import kotlin.getValue
 
 class WorldListener: Listener {
+    val denyBlocks: List<Material> = listOf(
+        Material.LADDER
+    )
+
     @EventHandler(priority = EventPriority.LOWEST)
     fun onWeatherChange(event: WeatherChangeEvent) {
         event.isCancelled = plugin!!.config.getBoolean("DenyWeatherChange")
+    }
+
+    @EventHandler (priority = EventPriority.LOWEST)
+    fun denyBreak(event: BlockBreakEvent) {
+        if (!denyBlocks.contains(event.block.type) || event.player.hasPermission("irina.admin")) return
+        event.isCancelled = true
+        event.player.sendMessage(translate("&c此方块不被允许破坏"))
     }
 
     @EventHandler
@@ -28,57 +43,97 @@ class WorldListener: Listener {
         if (player.hasPermission("irina.admin")) return
 
         val block = event.block
-        if (block.type.equals(Material.OBSIDIAN)) {
-            event.block.drops.clear()
-            block.world.dropItemNaturally(block.location, obsidian())
-        }
+        val blockType = block.type
 
-        if (block.type != Material.STAINED_CLAY) return
-        event.block.drops.clear()
-
-        if (RandomUtil.hasSuccessfullyByChance(0.01) || player.hasPermission("irina.crystal")) {
-            player.sendMessage(translate("&6&n恭喜!&7 你发掘到了传奇品质的晶石!"))
-            player.playSound(player.location, Sound.LEVEL_UP, 1f, 1f)
-            block.world.dropItemNaturally(block.location, legendaryCrystal())
+        if (blockType !in validBlockTypes) return
+        if (!slotsIsEmpty(player)) {
+            handleFullInventory(event, player)
             return
         }
 
-        val colorData = block.data.toByte()
-        val dyeColor = DyeColor.getByData(colorData)
+        when (blockType) {
+            Material.OBSIDIAN -> handleObsidian(event, player)
+            Material.STAINED_CLAY -> handleStainedClay(event, player, block)
+            else -> return
+        }
+    }
 
-        val itemStack = ItemStack(Material.STAINED_GLASS, 1)
-        val itemMeta = itemStack.itemMeta ?: return
+    private val validBlockTypes = setOf(Material.STAINED_CLAY, Material.OBSIDIAN)
 
-        var displayName: String = when (dyeColor) {
-            WHITE -> "&f&n白晶石"
-            BLACK -> "&0&n黑晶石"
-            BLUE -> "&9&l蓝晶石"
-            RED -> "&c&l红晶石"
-            ORANGE -> "&6&l橙晶石"
-            MAGENTA -> "&d&l洋红晶石"
-            LIGHT_BLUE -> "&b&l淡蓝晶石"
-            YELLOW -> "&e&l黄晶石"
-            LIME -> "&a&l亮绿晶石"
-            PINK -> "&d&l粉晶石"
-            GRAY -> "&8&l灰晶石"
-            SILVER -> "&7&l浅灰晶石"
-            CYAN -> "&3&l青晶石"
-            PURPLE -> "&5&l紫晶石"
-            BROWN -> "&4&l棕晶石"
-            GREEN -> "&a&l绿晶石"
-            else -> "&7&n未知的晶石"
+    private val crystalNames by lazy {
+        mapOf(
+            WHITE to "&f&n白晶石",
+            BLACK to "&0&n黑晶石",
+            BLUE to "&9&n蓝晶石",
+            RED to "&c&n红晶石",
+            ORANGE to "&6&n橙晶石",
+            MAGENTA to "&d&n品红晶石",
+            LIGHT_BLUE to "&b&n淡蓝晶石",
+            YELLOW to "&e&n黄晶石",
+            LIME to "&a&n亮绿晶石",
+            PINK to "&d&n粉晶石",
+            GRAY to "&8&n灰晶石",
+            SILVER to "&7&n浅灰晶石",
+            CYAN to "&3&n青晶石",
+            PURPLE to "&5&n紫晶石",
+            BROWN to "&4&n棕晶石",
+            GREEN to "&a&n绿晶石"
+        ).withDefault { "&7&n未知晶石" }
+    }
+
+    private fun crystalLore(): List<String> {
+        return translate(listOf(
+            "&7一种可被开采的晶石",
+            "&7稍微有那么一些价值",
+            "",
+            "&7品质: &f普通",
+            "&7回收价: &e${RandomUtil.helpMeToChooseOne(50, 60, 70)}$"
+        ))
+    }
+
+    private fun handleFullInventory(event: BlockBreakEvent, player: Player) {
+        event.isCancelled = true
+        player.sendMessage(translate("&c背包已满, 无法继续挖掘!"))
+    }
+
+    private fun handleObsidian(event: BlockBreakEvent, player: Player) {
+        event.block.type = Material.AIR
+        player.inventory.addItem(obsidian())
+    }
+
+    private fun handleStainedClay(event: BlockBreakEvent, player: Player, block: Block) {
+        event.expToDrop = 20
+
+        if (RandomUtil.hasSuccessfullyByChance(0.01) || player.hasPermission("irina.crystal")) {
+            handleLegendaryCrystal(player)
+            event.block.type = Material.AIR
+            return
         }
 
-        itemMeta.displayName = normalTranslate(displayName)
-        val lore = listOf(
-            normalTranslate("&f- &7一种可被挖掘的晶石"),
-            normalTranslate("&f- &7可能是一种有价值的矿物")
-        )
-        itemMeta.lore = lore
+        generateNormalCrystal(event, player, block)
+    }
 
-        itemStack.itemMeta = itemMeta
+    private fun handleLegendaryCrystal(player: Player) {
+        Bukkit.getScheduler().runTask(plugin) {
+            player.sendMessage(translate("&6&n恭喜!&7 你发掘到了传奇品质的晶石!"))
+            player.playSound(player.location, Sound.LEVEL_UP, 1f, 1f)
+        }
+        player.inventory.addItem(legendaryCrystal())
+    }
 
-        block.world.dropItemNaturally(block.location, itemStack)
+    private fun generateNormalCrystal(event: BlockBreakEvent, player: Player, block: Block) {
+        val colorData = block.data
+        val dyeColor = DyeColor.getByData(colorData.toByte())
+
+        val itemStack = ItemStack(Material.STAINED_GLASS, 1).apply {
+            itemMeta = (itemMeta ?: return@apply).also { meta ->
+                meta.displayName = normalTranslate(crystalNames[dyeColor]!!)
+                meta.lore = crystalLore()
+            }
+        }
+
+        event.block.type = Material.AIR
+        player.inventory.addItem(itemStack)
     }
 
     @EventHandler
@@ -86,8 +141,13 @@ class WorldListener: Listener {
         val player = event.player
         if (player.hasPermission("irina.admin")) return
 
-        val item = event.block.state as ItemStack
-        if (!item.type.equals(Material.STAINED_GLASS) || !item.itemMeta.displayName.contains("晶石")) return
+        val item = player.itemInHand
+        if (item.type != Material.STAINED_GLASS) return
+
+        val itemMeta = item.itemMeta ?: return
+        val displayName = itemMeta.displayName ?: return
+        if (!displayName.contains("晶石")) return
+
         event.isCancelled = true
         player.sendMessage(translate("&c该物品无法被放置!"))
     }
@@ -97,8 +157,11 @@ class WorldListener: Listener {
         val meta = item.itemMeta
         val lore = meta.lore?.toMutableList() ?: mutableListOf()
         lore.addAll(listOf(
-            "&f- &6传奇品质的晶石",
-            "&f- &6赚飞了兄弟!"
+            "&6传奇品质的晶石",
+            "&6赚飞了兄弟!",
+            "",
+            "&7品质: &6传奇",
+            "&7回收价: &e1000$"
         ))
 
         meta.displayName = normalTranslate("&f&k!!&r &6&n神话晶石&r &f&k!!")
@@ -112,13 +175,20 @@ class WorldListener: Listener {
         val meta = item.itemMeta
         val lore = meta.lore?.toMutableList() ?: mutableListOf()
         lore.addAll(listOf(
-            "&f- &c坚硬的金刚石",
-            "&f- &c但也很值钱"
+            "&c坚硬的金刚石",
+            "&c但也很值钱",
+            "",
+            "&7品质: &d稀有",
+            "&7回收价: &e600$"
         ))
 
         meta.displayName = normalTranslate("&c&n金刚晶石")
         meta.lore = translate(lore)
         item.itemMeta = meta
         return item
+    }
+
+    fun slotsIsEmpty(player: Player): Boolean {
+        return player.inventory.firstEmpty() != -1
     }
 }
