@@ -32,4 +32,6 @@ Message:
 #以下为创建收购物品的地方，格式为(物品ID: 价格)
 #物品ID可手持物品输入指令 /Sell id 查询
 SellItem:
-  DIAMOND: 50
+  STAINED_GLASS: 10
+  NETHER_STAR: 1000
+  OBSIDIAN: 500
