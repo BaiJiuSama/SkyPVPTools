@@ -6,7 +6,6 @@ import cn.irina.main.util.Chat
 import cn.irina.main.util.ClassUtil
 import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
-import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.plugin.RegisteredServiceProvider
 import java.lang.reflect.InvocationTargetException

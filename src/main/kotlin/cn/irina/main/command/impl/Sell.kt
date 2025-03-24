@@ -87,11 +87,11 @@ class Sell : Listener, CommandExecutor {
         (0 until sellGUISlot - 9).forEach { i ->
             inv.getItem(i)?.takeIf { it.type != Material.AIR }?.let { item ->
                 slotCount++
-                total += if (loreDetermine) {
-                    getPriceFromLore(item) * item.amount
-                } else {
-                    config.getDouble("SellItem.${item.type}") * item.amount
+                if (loreDetermine) {
+                    total += getPriceFromLore(item) * item.amount
+                    return@forEach
                 }
+                total += config.getDouble("SellItem.${item.type}") * item.amount
             }
         }
         return Pair(slotCount, total)

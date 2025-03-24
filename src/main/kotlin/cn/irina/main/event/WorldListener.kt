@@ -7,9 +7,11 @@ import cn.irina.main.util.RandomUtil
 import org.bukkit.Bukkit
 import org.bukkit.DyeColor
 import org.bukkit.DyeColor.*
+import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.block.Block
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -18,9 +20,12 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.weather.WeatherChangeEvent
 import org.bukkit.inventory.ItemStack
-import kotlin.getValue
+import org.yaml.snakeyaml.Yaml
+import java.io.File
+
 
 class WorldListener: Listener {
+    val regionsFolder = File("plugins/MineResetLite", "mines")
     val denyBlocks: List<Material> = listOf(
         Material.LADDER
     )
@@ -40,7 +45,13 @@ class WorldListener: Listener {
     @EventHandler
     fun onBreak(event: BlockBreakEvent) {
         val player = event.player
-        if (player.hasPermission("irina.admin")) return
+        if (player.hasPermission("irina.admin") || player.world.name.equals("world")) return
+
+        if (!checkPlayerInAllRegions(player)) {
+            event.isCancelled = true
+            player.sendMessage(translate("&c你不可以在此地开采!"))
+            return
+        }
 
         val block = event.block
         val blockType = block.type
@@ -51,11 +62,65 @@ class WorldListener: Listener {
             return
         }
 
+        val handItem = player.itemInHand
+        if (isTool(handItem)) {
+            var enchantLevel = handItem.getEnchantmentLevel(Enchantment.DURABILITY)
+            if (enchantLevel < 0) enchantLevel = 0
+            if (!RandomUtil.hasSuccessfullyByChance((enchantLevel * 5) * 0.01)) {
+                val newDurability = (handItem.durability + 1).toShort()
+                handItem.durability = newDurability
+                player.inventory.itemInHand = handItem
+                player.updateInventory()
+            }
+        }
+
+        player.giveExp(35)
+
         when (blockType) {
             Material.OBSIDIAN -> handleObsidian(event, player)
             Material.STAINED_CLAY -> handleStainedClay(event, player, block)
             else -> return
         }
+    }
+
+    fun checkPlayerInAllRegions(player: Player): Boolean {
+        if (!regionsFolder.exists() || !regionsFolder.isDirectory()) {
+            regionsFolder.mkdirs()
+            return false
+        }
+
+        val files: Array<File>? = regionsFolder.listFiles { _, name -> name.lowercase().endsWith(".yml") }
+        if (files == null) return false
+
+        val loc: Location = player.location
+        val x: Int = loc.blockX
+        val y: Int = loc.blockY
+        val z: Int = loc.blockZ
+
+        files.forEach { file ->
+            val config = Yaml().loadAs(file.inputStream(), Map::class.java)
+
+            val mineMap = config["mine"] as? Map<*, *> ?: return@forEach
+
+            val maxX = (mineMap["maxX"] as? Int) ?: return@forEach
+            val minX = (mineMap["minX"] as? Int) ?: return@forEach
+            val maxY = (mineMap["maxY"] as? Int)?.plus(3) ?: return@forEach
+            val minY = (mineMap["minY"] as? Int) ?: return@forEach
+            val maxZ = (mineMap["maxZ"] as? Int) ?: return@forEach
+            val minZ = (mineMap["minZ"] as? Int) ?: return@forEach
+            val worldName = mineMap["world"] as? String ?: return@forEach
+
+            if (x in minX..maxX && y in minY..maxY && z in minZ..maxZ && player.world.name == worldName) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    private fun isTool(item: ItemStack): Boolean {
+        val itemType = item.type.name.lowercase()
+        return itemType.endsWith("_pickaxe") || itemType.endsWith("_axe")
     }
 
     private val validBlockTypes = setOf(Material.STAINED_CLAY, Material.OBSIDIAN)
@@ -78,7 +143,7 @@ class WorldListener: Listener {
             PURPLE to "&5&n紫晶石",
             BROWN to "&4&n棕晶石",
             GREEN to "&a&n绿晶石"
-        ).withDefault { "&7&n未知晶石" }
+        ).withDefault { "&7&n原石" }
     }
 
     private fun crystalLore(): List<String> {
@@ -87,7 +152,7 @@ class WorldListener: Listener {
             "&7稍微有那么一些价值",
             "",
             "&7品质: &f普通",
-            "&7回收价: &e${RandomUtil.helpMeToChooseOne(50, 60, 70)}$"
+            "&7回收价: &e${RandomUtil.helpMeToChooseOne(20, 30, 45)}$"
         ))
     }
 
@@ -102,8 +167,6 @@ class WorldListener: Listener {
     }
 
     private fun handleStainedClay(event: BlockBreakEvent, player: Player, block: Block) {
-        event.expToDrop = 20
-
         if (RandomUtil.hasSuccessfullyByChance(0.01) || player.hasPermission("irina.crystal")) {
             handleLegendaryCrystal(player)
             event.block.type = Material.AIR

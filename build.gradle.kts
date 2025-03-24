@@ -1,7 +1,7 @@
 plugins {
     java
-    kotlin("jvm") version "2.1.10"
-    kotlin("plugin.lombok") version "2.1.10"
+    kotlin("jvm") version "2.1.20"
+    kotlin("plugin.lombok") version "2.1.20"
     id("io.freefair.lombok") version "8.10.2"
     id("com.gradleup.shadow") version "9.0.0-beta4"
 }
@@ -11,6 +11,7 @@ repositories {
 //    mavenCentral()
     maven("https://hub.spigotmc.org/nexus/content/groups/public/")
     maven("https://maven.aliyun.com/nexus/content/groups/public/")
+    maven("https://jitpack.io")
     maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
         name = "sonatype-oss-snapshots"
     }
@@ -22,6 +23,7 @@ dependencies {
     compileOnly(fileTree(baseDir = "lib"))
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
+    implementation("com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4")
 }
 
 group = "cn.irina"
