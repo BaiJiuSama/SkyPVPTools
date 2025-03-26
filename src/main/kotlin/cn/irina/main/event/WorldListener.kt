@@ -64,17 +64,18 @@ class WorldListener: Listener {
 
         val handItem = player.itemInHand
         if (isTool(handItem)) {
-            var enchantLevel = handItem.getEnchantmentLevel(Enchantment.DURABILITY)
-            if (enchantLevel < 0) enchantLevel = 0
-            if (!RandomUtil.hasSuccessfullyByChance((enchantLevel * 5) * 0.01)) {
+            var durabilityLevel = handItem.getEnchantmentLevel(Enchantment.DURABILITY)
+            if (durabilityLevel < 0) durabilityLevel = 0
+            if (!RandomUtil.hasSuccessfullyByChance((durabilityLevel * 5) * 0.01)) {
                 val newDurability = (handItem.durability + 1).toShort()
                 handItem.durability = newDurability
                 player.inventory.itemInHand = handItem
                 player.updateInventory()
             }
-        }
 
-        player.giveExp(35)
+            var fortuneLevel = handItem.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)
+            player.giveExp(20 + (fortuneLevel * 10))
+        }
 
         when (blockType) {
             Material.OBSIDIAN -> handleObsidian(event, player)
@@ -152,7 +153,7 @@ class WorldListener: Listener {
             "&7稍微有那么一些价值",
             "",
             "&7品质: &f普通",
-            "&7回收价: &e${RandomUtil.helpMeToChooseOne(20, 30, 45)}$"
+            "&7回收价: &e${RandomUtil.helpMeToChooseOne(20, 25, 35)}$"
         ))
     }
 

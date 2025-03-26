@@ -20,17 +20,27 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.player.AsyncPlayerChatEvent
+import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.Plugin
-import java.util.*
-import kotlin.text.append
 
 class PlayerListener : Listener {
     private val plugin: Plugin = SkyPVPTools.instance
     val rawMessage = plugin.config.getString("OtherMessage.Chat") ?: "%s: %s"
     val luckPerms = LuckPermsProvider.get()
+    val denyRunningCommands = listOf<String>(
+        "plot",
+        "plots",
+        "p",
+        "plotsquared",
+        "plot2",
+        "p2",
+        "ps",
+        "2",
+        "plotme"
+    )
 
     @EventHandler (priority = EventPriority.MONITOR)
     fun onJoin(event: PlayerJoinEvent) {
@@ -78,6 +88,20 @@ class PlayerListener : Listener {
         event.format = Chat.normalTranslate(String.format("%s", parsedMessage.replace("%", "%%")))
     }
 
+    @EventHandler (priority = EventPriority.HIGHEST)
+    fun onCommand(event: PlayerCommandPreprocessEvent) {
+        val fullCommand = event.message.lowercase()
+        val player = event.player
+        if (player.hasPermission("irina.admin") || !player.world.name.lowercase().contains("mine")) return
+
+        for (cmd in denyRunningCommands) {
+            if (!fullCommand.contains(cmd.lowercase())) continue
+            event.isCancelled = true
+            player.sendMessage(Chat.translate("&c注意, 你并不被允许在此世界使用此指令!"))
+            break
+        }
+    }
+
     @EventHandler
     fun onShow(event: AsyncPlayerChatEvent) {
         val player = event.getPlayer()
@@ -90,12 +114,12 @@ class PlayerListener : Listener {
 
         val hoverEvent = HoverEvent(HoverEvent.Action.SHOW_ITEM, item)
         val messageShow = if (handItem == null || handItem.type.equals(Material.AIR)) {
-            "我是一个空气, 你看你妈呢"
+            "[我是一个空气, 你看你妈呢]"
             return
         }
         else handItem.itemMeta.displayName ?: handItem.type.name.uppercase()
 
-        val itemHover = ChatComponentBuilder(messageShow).setCurrentHoverEvent(hoverEvent).create()
+        val itemHover = ChatComponentBuilder(Chat.normalTranslate("&f[ $messageShow &f]")).setCurrentHoverEvent(hoverEvent).create()
         val parsedFormat = Chat.normalTranslate(String.format("%s", PApi.parsePlaceholders(player, rawMessage.replace("!msg", "")).replace("%", "%%")))
 
         val msg = ChatComponentBuilder(parsedFormat).append(itemHover).create()

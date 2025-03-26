@@ -85,7 +85,7 @@ class ChatComponentBuilder(text: String) : ComponentBuilder("") {
 
         if (!Pattern.compile(regex).matcher(modifiedText).find()) {
             if (parts?.isEmpty() == true && current != null && current!!.text.isEmpty()) {
-                current?.setText(modifiedText)
+                current?.text = modifiedText
             } else {
                 append(modifiedText)
             }
