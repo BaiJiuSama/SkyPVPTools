@@ -30,6 +30,11 @@ class WorldListener: Listener {
         Material.LADDER
     )
 
+    val allowBreakWorlds: List<String> = listOf(
+        "world",
+        "plotworld"
+    )
+
     @EventHandler(priority = EventPriority.LOWEST)
     fun onWeatherChange(event: WeatherChangeEvent) {
         event.isCancelled = plugin!!.config.getBoolean("DenyWeatherChange")
@@ -45,7 +50,7 @@ class WorldListener: Listener {
     @EventHandler
     fun onBreak(event: BlockBreakEvent) {
         val player = event.player
-        if (player.hasPermission("irina.admin") || player.world.name.equals("world")) return
+        if (player.hasPermission("irina.admin") || allowBreakWorlds.contains(player.world.name.lowercase())) return
 
         if (!checkPlayerInAllRegions(player)) {
             event.isCancelled = true
@@ -66,12 +71,16 @@ class WorldListener: Listener {
         if (isTool(handItem)) {
             var durabilityLevel = handItem.getEnchantmentLevel(Enchantment.DURABILITY)
             if (durabilityLevel < 0) durabilityLevel = 0
-            if (!RandomUtil.hasSuccessfullyByChance((durabilityLevel * 5) * 0.01)) {
+
+            if (handItem.durability >= handItem.type.maxDurability) {
+                player.sendMessage(translate("&cLLLLLL你的工具爆了"))
+                player.inventory.itemInHand = ItemStack(Material.AIR)
+            } else if (!RandomUtil.hasSuccessfullyByChance((durabilityLevel * 5) * 0.01)) {
                 val newDurability = (handItem.durability + 1).toShort()
                 handItem.durability = newDurability
                 player.inventory.itemInHand = handItem
-                player.updateInventory()
             }
+            player.updateInventory()
 
             var fortuneLevel = handItem.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)
             player.giveExp(20 + (fortuneLevel * 10))
@@ -225,7 +234,7 @@ class WorldListener: Listener {
             "&6赚飞了兄弟!",
             "",
             "&7品质: &6传奇",
-            "&7回收价: &e1000$"
+            "&7回收价: &e888$"
         ))
 
         meta.displayName = normalTranslate("&f&k!!&r &6&n神话晶石&r &f&k!!")

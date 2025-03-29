@@ -31,15 +31,15 @@ class PlayerListener : Listener {
     val rawMessage = plugin.config.getString("OtherMessage.Chat") ?: "%s: %s"
     val luckPerms = LuckPermsProvider.get()
     val denyRunningCommands = listOf<String>(
-        "plot",
-        "plots",
-        "p",
-        "plotsquared",
-        "plot2",
-        "p2",
-        "ps",
-        "2",
-        "plotme"
+        "/plot",
+        "/plots",
+        "/p",
+        "/plotsquared",
+        "/plot2",
+        "/p2",
+        "/ps",
+        "/2",
+        "/plotme"
     )
 
     @EventHandler (priority = EventPriority.MONITOR)
